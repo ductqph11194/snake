@@ -199,7 +199,7 @@ function Test(props) {
 
     useEffect(() => {
 
-        document.body.addEventListener('keydown', this.handleKeyPress);
+        window.addEventListener('keydown', handleKeyPress());
 
         setTable((state) => {
             const newState = {
@@ -222,12 +222,8 @@ function Test(props) {
         // Set tick
         window.fnInterval = setInterval(() => {
             gameTick();
-        }, table.tickTime);
-    })
-    useEffect(() => {
-        document.body.addEventListener('keydown', handleKeyPress());
-        clearInterval(window.fnInterval)
-    })
+        });
+    }, [])
 
     return (
         <div className="App">
@@ -240,7 +236,7 @@ function Test(props) {
                             ? 'item is-head' : table.isTail
                                 ? 'item is-tail' : table.isFood
                                     ? 'item is-food' : 'item'
-                    } >log</div>)
+                    } ></div>)
             })}</div>
 
         </div>
