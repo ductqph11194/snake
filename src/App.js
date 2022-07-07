@@ -78,7 +78,9 @@ export default class App extends Component {
       })
     }
   }
+  restart() {
 
+  }
   gameTick() {
     this.setState((state) => {
       let {
@@ -127,6 +129,10 @@ export default class App extends Component {
           head.row++;
           break;
 
+        case 'reload':
+          this.setState({} = this.state)
+          break;
+
         case 'right':
         default:
           head.col++;
@@ -165,30 +171,42 @@ export default class App extends Component {
 
   handleKeyPress(e) {
     let {
-      currentDirection
+      currentDirection,
+      direction,
     } = this.state;
 
     switch (e.keyCode) {
-      case 37:
-        currentDirection = 'left';
-        break;
-
       case 38:
-        currentDirection = 'up';
+      case 87:
+        if (direction !== "up" && direction !== "down") {
+          currentDirection = "up";
+        }
         break;
-
-      case 39:
-      default:
-        currentDirection = 'right';
-        break;
-
       case 40:
-        currentDirection = 'down';
+      case 83:
+        if (direction !== "up" && direction !== "down") {
+          currentDirection = "down";
+        }
+        break;
+      case 37:
+      case 65:
+        if (direction !== "left" && direction !== "right") {
+          currentDirection = "left";
+        }
+        break;
+      case 39:
+      case 68:
+        if (direction !== "left" && direction !== "right") {
+          currentDirection = "right";
+        }
+        break;
+      case 81:
+        currentDirection = "reload";
         break;
     }
-
     const newState = {
       ...this.state,
+      direction,
       currentDirection,
     }
     const grid = this.resetGrid(newState, true);
