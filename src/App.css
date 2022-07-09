@@ -11,7 +11,7 @@
   height: 600px;
   margin: auto;
   display: flex;
-  flex-direction: row;
+
   flex-wrap: wrap;
   border: 1px solid black !important;
 }
@@ -24,7 +24,7 @@
 }
 
 .is-food {
-  background-color: black;
+  background-color: grey;
 }
 
 .is-head {
