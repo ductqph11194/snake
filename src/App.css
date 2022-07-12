@@ -16,6 +16,16 @@
   border: 1px solid black !important;
 }
 
+.grids {
+  width: 600px;
+  height: 600px;
+  margin: auto;
+  display: flex;
+
+  flex-wrap: wrap;
+  border: 1px solid black !important;
+}
+
 .item {
   outline: 1px solid #eee;
   width: 40px;
@@ -38,4 +48,5 @@
 .grid-message {
   width: 100%;
   text-align: center;
+
 }

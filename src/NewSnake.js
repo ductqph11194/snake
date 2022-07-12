@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react';
 
 const NewSnake = () => {
     const rows = 15;
@@ -11,73 +11,98 @@ const NewSnake = () => {
     });
     const [die, setDie] = useState(false);
     const [currentDirection, setCurrentDirection] = useState('right');
-    const [tick, setTick] = useState(0)
+    const [tick, setTick] = useState(0);
 
     const resetGrid = (state = {}, sendBack = false) => {
         if (!Object.keys(state).length) {
             state = grid;
         }
         const table = [];
-        const body = []
-        const firstFood = []
+        const body = [];
+        const firstFood = [];
         for (let row = 0; row < rows; row++) {
             for (let col = 0; col < cols; col++) {
-                const isFood = (food.row === row && food.col === col);
-                const isHead = (snake.head.row === row && snake.head.col === col);
+                const isFood = food.row === row && food.col === col;
+                const isHead = snake.head.row === row && snake.head.col === col;
                 let isTail = false;
-                snake.tail.forEach(t => {
+                snake.tail.forEach((t) => {
                     if (t.row === row && t.col === col) {
-                        isTail = true
+                        isTail = true;
                     }
-                })
+                });
                 table.push({
                     row,
                     col,
+                    isFood,
+                    isHead,
+                    isTail,
                 });
                 body.push({
-                    isHead,
-                    isTail
-                })
+
+                });
                 firstFood.push({
-                    isFood
-                })
+
+                });
             }
         }
         if (sendBack) {
-            return grid
+            return grid;
         } else {
-            setGrid({ table });
-            setSnake({ body })
-            setFood({ firstFood })
+            setGrid(table);
+            //   setSnake({ body });
+            //   setFood({ firstFood });
         }
-    }
+    };
+
     const gameTick = () => {
-        setTick(counter => counter + 1);
-    }
+        setTick((counter) => counter + 1);
+    };
+
     const getHead = () => {
         return {
             row: Math.floor((rows - 1) / 2),
             col: Math.floor((cols - 1) / 2),
-        }
-    }
+        };
+    };
+
     const getRandomFood = () => {
         return {
             row: Math.floor((Math.random() * rows)),
-            col: Math.floor((Math.random() * cols))
-        }
-    }
-    useEffect(() => {
-        const {
-            row,
-            col
-        } = snake.head;
+            col: Math.floor((Math.random() * cols)),
+        };
+    };
 
-        let {
-            tail
-        } = snake.tail;
+    const handleKeyPress = (e) => {
+        switch (e.keyCode) {
+            case 38:
+            case 87:
+                setCurrentDirection('up');
+                break;
+
+            case 40:
+            case 83:
+                setCurrentDirection('down');
+                break;
+
+            case 37:
+            case 65:
+                setCurrentDirection('left');
+                break;
+
+            case 39:
+            case 68:
+                setCurrentDirection('right');
+                break;
+        }
+    };
+
+    useEffect(() => {
+        const { row, col } = snake.head;
+
+        let { tail } = snake;
         let head = {
             row,
-            col
+            col,
         };
         if (die) {
             clearInterval(window.fnInterval);
@@ -89,9 +114,9 @@ const NewSnake = () => {
         });
 
         if (head.row === food.row && head.col === food.col) {
-            food = getRandomFood();
+            setFood(getRandomFood());
         } else {
-            tail.pop()
+            tail.pop();
         }
 
         switch (currentDirection) {
@@ -116,9 +141,9 @@ const NewSnake = () => {
         const newSnake = {
             snake: {
                 head,
-                tail
-            }
-        }
+                tail,
+            },
+        };
 
         if (
             newSnake.snake.head.row < 0 ||
@@ -126,78 +151,84 @@ const NewSnake = () => {
             newSnake.snake.head.col < 0 ||
             newSnake.snake.head.col >= rows
         ) {
-            setDie(true)
+            setDie(true);
         }
-        const newGrid = resetGrid({}, true);
+        resetGrid({ a: 0 }, false);
 
-        return {
-            ...newSnake,
-            die,
-            newGrid
+        // return {
+        //     ...newSnake,
+        //     die,
+        //     newGrid
 
-        }
+        // }
 
-    })
-    const handleKeyPress = (e) => {
-        switch (e.keyCode) {
-            case 38:
-            case 87:
-                setCurrentDirection("left");
-                break;
+        setSnake(newSnake.snake);
+    }, [tick]);
 
-            case 40:
-            case 83:
-                setCurrentDirection("down");
-                break;
-
-            case 37:
-            case 65:
-                setCurrentDirection("left");
-                break;
-
-            case 39:
-            case 68:
-                setCurrentDirection("right");
-                break;
-
-        }
-    }
     useEffect(() => {
         document.body.addEventListener('keydown', handleKeyPress);
         setFood(getRandomFood());
-        setSnake({
-            head: getHead(),
-            tail: snake.tail
-        })
 
+        // setSnake({
+        //   head: { row: 7, col: 7 },
+        //   tail: snake.tail,
+        // });
+        const newSnake = {
+            snake: {
+                head: getHead(),
+                tail: snake.tail,
+            },
+        };
+        setSnake(newSnake.snake);
         resetGrid();
         window.fnInterval = setInterval(() => {
             gameTick();
-        }, 200)
-    }, [])
+        }, 300);
+
+    }, []);
 
     return (
         <div className="App">
             <div className="grid">
-                {grid.map((grids, index) => {
+                {/* { ()=>{
+                if(die){
                     return (
-                        <div key={grids.row.toString() + '-' + grids.col.toString()}
-                            className={
-                                grids.isHead
-                                    ? 'item is-head' : grids.isTail
-                                        ? 'item is-tail' : grids.isFood
-                                            ? 'item is-food' : 'item'
-                            }
-                        >
-
-                        </div>
-                    )
-                })
-
+                        <div
+                            className="grid-message">
+                            <h1>Game Over</h1>
+                        </div>)
                 }
+            }
+            } */}
+
+                {grid.map((grids, index) => {
+                    if (die) {
+                        <div
+                            key={''}
+                            className="grid-message">
+                            <h1>Game Over</h1>
+                        </div>
+                    } else {
+                        return (
+                            <div
+                                key={grids.row.toString() + '-' + grids.col.toString()}
+                                className={
+                                    grids.isHead
+                                        ? 'item is-head'
+                                        : grids.isTail
+                                            ? 'item is-tail'
+                                            : grids.isFood
+                                                ? 'item is-food'
+                                                : 'item'
+                                }
+                            ></div>
+                        );
+                    }
+                })}
+
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default NewSnake
+export default NewSnake;
