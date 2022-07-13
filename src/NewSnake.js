@@ -178,7 +178,12 @@ const NewSnake = () => {
                 break;
 
             case 32:
-                resStartGame();
+                if(die ==true)
+                {resStartGame();}
+                else{
+                 handlePause();   
+                }
+
                 break;
         }
      console.log(pause);
