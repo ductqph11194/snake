@@ -12,14 +12,95 @@ const NewSnake = () => {
     const [die, setDie] = useState(false);
     const [currentDirection, setCurrentDirection] = useState('right');
     const [tick, setTick] = useState(0);
+    const [pause,setPause]=useState(false);
 
-    const resetGrid = (state = {}, sendBack = false) => {
-        if (!Object.keys(state).length) {
-            state = grid;
+    useEffect(() => {
+        if (pause==false){
+        const { row, col } = snake.head;
+
+        let { tail } = snake;
+        let head = {
+            row,
+            col,
+        };
+        if (die) {
+            clearInterval(window.fnInterval);
         }
+        
+        tail.unshift({
+            row: head.row,
+            col: head.col,
+        });
+
+        if (head.row === food.row && head.col === food.col) {
+            setFood(getRandomFood());
+        }
+         else {
+            tail.pop();
+            }
+
+        switch (currentDirection) {
+            case 'left':
+                head.col--;
+                break;
+
+            case 'up':
+                head.row--;
+                break;
+
+            case 'down':
+                head.row++;
+                break;
+
+            case 'right':
+            default:
+                head.col++;
+                break;
+        }
+
+        const newSnake = {
+            snake: {
+                head,
+                tail,
+            },
+        };
+
+        if (
+            newSnake.snake.head.row < 0 ||
+            newSnake.snake.head.row >= rows ||
+            newSnake.snake.head.col < 0 ||
+            newSnake.snake.head.col >= rows
+        ) {
+            setDie(true);
+        }
+        setSnake(newSnake.snake);
+        resetGrid();
+    }
+    }, [tick,pause]);
+
+    useEffect(() => {
+        document.body.addEventListener('keydown', handleKeyPress);
+        setFood(getRandomFood());
+
+        const newSnake = {
+            snake: {
+                head: getHead(),
+                tail: snake.tail,
+            },
+        };
+        setSnake(newSnake.snake);
+        resetGrid();
+        window.fnInterval = setInterval(() => {
+            gameTick();
+        }, 250);
+        return () => {
+            clearInterval(window.fnInterval);
+        }
+
+    }, []);
+
+    const resetGrid = () => {
         const table = [];
-        const body = [];
-        const firstFood = [];
         for (let row = 0; row < rows; row++) {
             for (let col = 0; col < cols; col++) {
                 const isFood = food.row === row && food.col === col;
@@ -37,21 +118,9 @@ const NewSnake = () => {
                     isHead,
                     isTail,
                 });
-                body.push({
-
-                });
-                firstFood.push({
-
-                });
             }
         }
-        if (sendBack) {
-            return grid;
-        } else {
-            setGrid(table);
-            //   setSnake({ body });
-            //   setFood({ firstFood });
-        }
+        setGrid(table);
     };
 
     const gameTick = () => {
@@ -71,6 +140,7 @@ const NewSnake = () => {
             col: Math.floor((Math.random() * cols)),
         };
     };
+
 
     const handleKeyPress = (e) => {
         switch (e.keyCode) {
@@ -95,124 +165,15 @@ const NewSnake = () => {
                 break;
 
             case 32:
-                setCurrentDirection('reload');
+                setPause(!pause);
                 break;
         }
+        console.log(pause);
     };
-
-
-    useEffect(() => {
-        const { row, col } = snake.head;
-
-        let { tail } = snake;
-        let head = {
-            row,
-            col,
-        };
-        if (die) {
-            clearInterval(window.fnInterval);
-        }
-
-        tail.unshift({
-            row: head.row,
-            col: head.col,
-        });
-
-        if (head.row === food.row && head.col === food.col) {
-            setFood(getRandomFood());
-        } else {
-            tail.pop();
-        }
-
-        switch (currentDirection) {
-            case 'left':
-                head.col--;
-                break;
-
-            case 'up':
-                head.row--;
-                break;
-
-            case 'down':
-                head.row++;
-                break;
-
-            case 'reload':
-
-                break;
-
-            case 'right':
-            default:
-                head.col++;
-                break;
-        }
-
-        const newSnake = {
-            snake: {
-                head,
-                tail,
-            },
-        };
-
-        if (
-            newSnake.snake.head.row < 0 ||
-            newSnake.snake.head.row >= rows ||
-            newSnake.snake.head.col < 0 ||
-            newSnake.snake.head.col >= rows
-        ) {
-            setDie(true);
-        }
-        resetGrid({ a: 0 }, false);
-
-        // return {
-        //     ...newSnake,
-        //     die,
-        //     newGrid
-
-        // }
-
-        setSnake(newSnake.snake);
-    }, [tick]);
-
-    useEffect(() => {
-        document.body.addEventListener('keydown', handleKeyPress);
-        setFood(getRandomFood());
-
-        // setSnake({
-        //   head: { row: 7, col: 7 },
-        //   tail: snake.tail,
-        // });
-        const newSnake = {
-            snake: {
-                head: getHead(),
-                tail: snake.tail,
-            },
-        };
-        setSnake(newSnake.snake);
-        resetGrid();
-        window.fnInterval = setInterval(() => {
-            gameTick();
-        }, 300);
-        return () => {
-            clearInterval(window.fnInterval);
-        }
-
-    }, []);
 
     return (
         <div className="App">
             <div className="grid">
-                {/* { ()=>{
-                if(die){
-                    return (
-                        <div
-                            className="grid-message">
-                            <h1>Game Over</h1>
-                        </div>)
-                }
-            }
-            } */}
-
                 {grid.map((grids, index) => {
                     if (die) {
                         <div
