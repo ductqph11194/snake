@@ -93,8 +93,13 @@ const NewSnake = () => {
             case 68:
                 setCurrentDirection('right');
                 break;
+
+            case 32:
+                setCurrentDirection('reload');
+                break;
         }
     };
+
 
     useEffect(() => {
         const { row, col } = snake.head;
@@ -130,6 +135,10 @@ const NewSnake = () => {
 
             case 'down':
                 head.row++;
+                break;
+
+            case 'reload':
+
                 break;
 
             case 'right':
@@ -184,6 +193,9 @@ const NewSnake = () => {
         window.fnInterval = setInterval(() => {
             gameTick();
         }, 300);
+        return () => {
+            clearInterval(window.fnInterval);
+        }
 
     }, []);
 
