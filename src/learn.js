@@ -1,16 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, createContext } from 'react';
+import Content from './Content';
+import './App.css'
 
-function Exam(props) {
-    const handeleFreviewAvatar = (e) => {
-        const file = e.taarget.files[0]
+export const ThemeContext = createContext();
+
+function Exam() {
+    const [theme,setTheme] = useState('dark')
+
+    const toggleTheme = ()=>{
+        setTheme(theme === 'dark'?'light':'dark')
     }
-
     return (
-        <div>
-            <input type="text"
-                onChange={handeleFreviewAvatar}
-            />
+        <ThemeContext.Provider value={theme}>
+        <div >
+            <button onClick={toggleTheme}>ẤN</button>
+            <Content />
         </div>
+        </ThemeContext.Provider>
     )
 }
 export default Exam

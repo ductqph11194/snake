@@ -49,3 +49,7 @@
   width: 100%;
   text-align: center;
 }
+.dark{
+  color:white;
+  background-color:red;
+}
