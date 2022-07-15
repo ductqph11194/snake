@@ -44,6 +44,9 @@
 .is-tail {
   background-color: orange;
 }
+.is-die{
+  background-color: grey;
+}
 
 .grid-message {
   width: 100%;

@@ -28,6 +28,12 @@ const NewSnake = () => {
             clearInterval(window.fnInterval);
         }
     }, []);
+    useEffect(() => {
+        document.body.addEventListener('keydown', handleKeyPress);
+        return () => {
+            document.body.removeEventListener('keydown', handleKeyPress);
+        }
+    }, [currentDirection])
 
     useEffect(() => {
         if (die) {
@@ -81,9 +87,9 @@ const NewSnake = () => {
             };
 
             if (
-                newSnake.snake.head.row < 0 ||
+                newSnake.snake.head.row < -1 ||
                 newSnake.snake.head.row > rows ||
-                newSnake.snake.head.col < 0 ||
+                newSnake.snake.head.col < -1 ||
                 newSnake.snake.head.col > rows
             ) {
                 setDie(true);
@@ -91,8 +97,9 @@ const NewSnake = () => {
             }
             setSnake(newSnake.snake);
             resetGrid();
+            console.log(die);
         }
-    }, [tick, pause, die]);
+    }, [tick, pause, die,]);
 
     useEffect(() => {
         document.body.addEventListener('keydown', handleKeyPressPause);
@@ -109,6 +116,8 @@ const NewSnake = () => {
                 const isFood = food.row === row && food.col === col;
                 const isHead = snake.head.row === row && snake.head.col === col;
                 let isTail = false;
+                let isDie = die === true;
+
                 snake.tail.forEach((t) => {
                     if (t.row === row && t.col === col) {
                         isTail = true;
@@ -120,6 +129,7 @@ const NewSnake = () => {
                     isFood,
                     isHead,
                     isTail,
+                    isDie
                 });
             }
         }
@@ -167,27 +177,38 @@ const NewSnake = () => {
     }
 
     const handleKeyPress = (e) => {
+
+
         switch (e.keyCode) {
             case 38:
             case 87:
-                setCurrentDirection('up');
+                if (currentDirection !== "down") {
+                    setCurrentDirection('up');
+                }
                 break;
 
             case 40:
             case 83:
-                setCurrentDirection('down');
+                if (currentDirection !== "up") {
+                    setCurrentDirection('down');
+                }
                 break;
 
             case 37:
             case 65:
-                setCurrentDirection('left');
+                if (currentDirection !== "right") {
+                    setCurrentDirection('left');
+                }
                 break;
 
             case 39:
             case 68:
-                setCurrentDirection('right');
+                if (currentDirection !== "left") {
+                    setCurrentDirection('right');
+                }
                 break;
         }
+
 
     };
 
@@ -217,7 +238,7 @@ const NewSnake = () => {
                                         ? 'item is-tail'
                                         : grids.isFood
                                             ? 'item is-food'
-                                            : 'item'
+                                            : grids.isDie ? 'item is-die' : 'item'
                             }
                         ></div>
                     );
