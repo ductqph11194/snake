@@ -5,7 +5,6 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 
 import NewSnake from './NewSnake';
-import Exam from './learn';
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));

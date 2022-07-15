@@ -12,85 +12,80 @@ const NewSnake = () => {
     const [die, setDie] = useState(false);
     const [currentDirection, setCurrentDirection] = useState('right');
     const [tick, setTick] = useState(0);
-    const [pause,setPause]=useState(false);
+    const [pause, setPause] = useState(false);
 
     useEffect(() => {
-        if (pause==false) {
-        const { row, col } = snake.head;
+        if (pause === false) {
+            const { row, col } = snake.head;
 
-        let { tail } = snake;
-        let head = {
-            row,
-            col,
-        };
-        
-        tail.unshift({
-            row: head.row,
-            col: head.col,
-        });
+            let { tail } = snake;
+            let head = {
+                row,
+                col,
+            };
 
-        if (head.row === food.row && head.col === food.col) {
-            setFood(getRandomFood());
-        }
-         else {
-            tail.pop();
+            tail.unshift({
+                row: head.row,
+                col: head.col,
+            });
+
+            if (head.row === food.row && head.col === food.col) {
+                setFood(getRandomFood());
+            }
+            else {
+                tail.pop();
             }
 
-        switch (currentDirection) {
-            case 'left':
-                head.col--;
-                break;
+            switch (currentDirection) {
+                case 'left':
+                    head.col--;
+                    break;
 
-            case 'up':
-                head.row--;
-                break;
+                case 'up':
+                    head.row--;
+                    break;
 
-            case 'down':
-                head.row++;
-                break;
+                case 'down':
+                    head.row++;
+                    break;
 
-            case 'right':
-            default:
-                head.col++;
-                break;
+                case 'right':
+                default:
+                    head.col++;
+                    break;
+            }
+
+            const newSnake = {
+                snake: {
+                    head,
+                    tail,
+                },
+            };
+
+            if (
+                newSnake.snake.head.row < 0 ||
+                newSnake.snake.head.row > rows ||
+                newSnake.snake.head.col < 0 ||
+                newSnake.snake.head.col > rows
+            ) {
+                setDie(true);
+            }
+            setSnake(newSnake.snake);
+            resetGrid();
+            console.log(die);
         }
+    }, [tick, pause]);
 
-        const newSnake = {
-            snake: {
-                head,
-                tail,
-            },
-        };
+    useEffect(() => {
+        if (die === true) {
+            document.body.addEventListener('keydown', handleKeyPressPause);
 
-        if (
-            newSnake.snake.head.row < 0 ||
-            newSnake.snake.head.row >= rows ||
-            newSnake.snake.head.col < 0 ||
-            newSnake.snake.head.col >= rows
-        ) {
-            setDie(true);
+            return () => {
+                document.body.removeEventListener('keydown', handleKeyPressPause);
+                clearInterval(window.fnInterval);
+            }
         }
-        setSnake(newSnake.snake);
-        resetGrid();
-        console.log(snake);
-    }
-    }, [tick,pause]);
-    
-    const handlePause=()=>{
-        setPause(!pause)
-    }
-    const resStartGame=()=>{
-
-     setGrid([]);
-     setFood({});
-     setSnake({
-        head:{},
-        tail: [],
-     })   
-     setCurrentDirection('right');
-     setTick(0)
-     setDie(false)
-    }
+    }, [die]);
 
     useEffect(() => {
         document.body.addEventListener('keydown', handleKeyPress);
@@ -108,10 +103,13 @@ const NewSnake = () => {
             gameTick();
         }, 250);
         return () => {
+            document.body.removeEventListener('keydown', handleKeyPress);
             clearInterval(window.fnInterval);
         }
 
     }, []);
+
+
 
     const resetGrid = () => {
         const table = [];
@@ -155,6 +153,28 @@ const NewSnake = () => {
         };
     };
 
+    const handlePause = () => {
+        setPause(pause => !pause)
+    }
+    const resStartGame = () => {
+        setDie(false)
+        const newSnake = {
+            snake: {
+                head: getHead(),
+                tail: snake.tail,
+            },
+        };
+        setGrid([]);
+        setFood({});
+        resetGrid()
+        setSnake(
+            newSnake.snake
+        )
+        setCurrentDirection('right');
+        setTick(0)
+
+    }
+
     const handleKeyPress = (e) => {
         switch (e.keyCode) {
             case 38:
@@ -176,29 +196,29 @@ const NewSnake = () => {
             case 68:
                 setCurrentDirection('right');
                 break;
-
             case 32:
-                if(die ==true)
-                {resStartGame();}
-                else{
-                 handlePause();   
-                }
-
-                break;
+                if (die === false) { handlePause(); }
         }
-     console.log(pause);
+
     };
+
+    const handleKeyPressPause = (e) => {
+        switch (e.keyCode) {
+            case 32:
+                if (die === true) { resStartGame(); }
+        }
+    }
 
     return (
         <div className="App">
             <div className="grid">
                 {grid.map((grids, index) => {
-                    if (die) {
-                        <div
-                            key={''}
-                            className="grid-message">
-                            <h1>Game Over</h1>
-                        </div>
+                    if (die === true) {
+                        return (
+                            <div
+                                key={grids.row.toString() + '-' + grids.col.toString()}
+                                className="item">
+                            </div>)
                     } else {
                         return (
                             <div
