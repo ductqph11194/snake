@@ -6,8 +6,8 @@ const NewSnake = () => {
     const [grid, setGrid] = useState([]);
     const [food, setFood] = useState({});
     const [snake, setSnake] = useState({
-        head: {},
-        tail: [],
+        head: { row: 7, col: 7 },
+        tail: [{ row: 7, col: 7 }],
     });
     const [die, setDie] = useState(false);
     const [currentDirection, setCurrentDirection] = useState('right');
@@ -15,6 +15,24 @@ const NewSnake = () => {
     const [pause, setPause] = useState(false);
 
     useEffect(() => {
+        document.body.addEventListener('keydown', handleKeyPress);
+        setFood(getRandomFood());
+        resetGrid();
+
+        window.fnInterval = setInterval(() => {
+            gameTick();
+        }, 250);
+
+        return () => {
+            document.body.removeEventListener('keydown', handleKeyPress);
+            clearInterval(window.fnInterval);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (die) {
+            return
+        }
         if (pause === false) {
             const { row, col } = snake.head;
 
@@ -69,47 +87,20 @@ const NewSnake = () => {
                 newSnake.snake.head.col > rows
             ) {
                 setDie(true);
+                return
             }
             setSnake(newSnake.snake);
             resetGrid();
-            console.log(die);
         }
-    }, [tick, pause]);
+    }, [tick, pause, die]);
 
     useEffect(() => {
-        if (die === true) {
-            document.body.addEventListener('keydown', handleKeyPressPause);
+        document.body.addEventListener('keydown', handleKeyPressPause);
 
-            return () => {
-                document.body.removeEventListener('keydown', handleKeyPressPause);
-                clearInterval(window.fnInterval);
-            }
+        return () => {
+            document.body.removeEventListener('keydown', handleKeyPressPause);
         }
     }, [die]);
-
-    useEffect(() => {
-        document.body.addEventListener('keydown', handleKeyPress);
-        setFood(getRandomFood());
-
-        const newSnake = {
-            snake: {
-                head: getHead(),
-                tail: snake.tail,
-            },
-        };
-        setSnake(newSnake.snake);
-        resetGrid();
-        window.fnInterval = setInterval(() => {
-            gameTick();
-        }, 250);
-        return () => {
-            document.body.removeEventListener('keydown', handleKeyPress);
-            clearInterval(window.fnInterval);
-        }
-
-    }, []);
-
-
 
     const resetGrid = () => {
         const table = [];
@@ -160,12 +151,12 @@ const NewSnake = () => {
         setDie(false)
         const newSnake = {
             snake: {
-                head: getHead(),
-                tail: snake.tail,
+                head: { row: 7, col: 7 },
+                tail: [{ row: 7, col: 7 }],
             },
         };
         setGrid([]);
-        setFood({});
+        setFood(getRandomFood());
         resetGrid()
         setSnake(
             newSnake.snake
@@ -196,8 +187,6 @@ const NewSnake = () => {
             case 68:
                 setCurrentDirection('right');
                 break;
-            case 32:
-                if (die === false) { handlePause(); }
         }
 
     };
@@ -205,7 +194,12 @@ const NewSnake = () => {
     const handleKeyPressPause = (e) => {
         switch (e.keyCode) {
             case 32:
-                if (die === true) { resStartGame(); }
+                if (die === false) {
+                    handlePause();
+                }
+                if (die === true) {
+                    resStartGame();
+                }
         }
     }
 
@@ -213,28 +207,20 @@ const NewSnake = () => {
         <div className="App">
             <div className="grid">
                 {grid.map((grids, index) => {
-                    if (die === true) {
-                        return (
-                            <div
-                                key={grids.row.toString() + '-' + grids.col.toString()}
-                                className="item">
-                            </div>)
-                    } else {
-                        return (
-                            <div
-                                key={grids.row.toString() + '-' + grids.col.toString()}
-                                className={
-                                    grids.isHead
-                                        ? 'item is-head'
-                                        : grids.isTail
-                                            ? 'item is-tail'
-                                            : grids.isFood
-                                                ? 'item is-food'
-                                                : 'item'
-                                }
-                            ></div>
-                        );
-                    }
+                    return (
+                        <div
+                            key={grids.row.toString() + '-' + grids.col.toString()}
+                            className={
+                                grids.isHead
+                                    ? 'item is-head'
+                                    : grids.isTail
+                                        ? 'item is-tail'
+                                        : grids.isFood
+                                            ? 'item is-food'
+                                            : 'item'
+                            }
+                        ></div>
+                    );
                 })}
 
             </div>
